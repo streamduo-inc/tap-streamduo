@@ -1,0 +1,48 @@
+{
+  "streams": [
+    {
+      "tap_stream_id": "sample_stream",
+      "key_properties": [],
+      "schema": {
+        "properties": {
+          "record_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "stream_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "recordTimeStampISO": {
+            "format": "date-time",
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "readStatus": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          },
+          "dataPayload": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "type": [
+          "null",
+          "object"
+        ],
+        "additionalProperties": false
+      },
+      "stream": "sample_stream",
+      "metadata": []
+    }
+  ]
+}

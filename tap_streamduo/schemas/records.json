@@ -1,0 +1,22 @@
+{
+    "type": ["null", "object"],
+    "additionalProperties": false,
+    "properties": {
+	"record_id": {
+	    "type": ["string"]
+	},
+	"stream_id": {
+	    "type": ["string"]
+	},
+	"recordTimeStampISO": {
+		"type": ["null", "string"],
+		"format": "date-time"
+	},
+  	"readStatus": {
+	    "type": ["null", "boolean"]
+        },
+	"dataPayload": {
+	"type": ["null", "string"]
+	}
+    }
+}
