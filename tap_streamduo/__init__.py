@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 import os
 import json
+import time
+
 import singer
-from singer import utils, metadata
+from singer import utils
 from singer.catalog import Catalog, CatalogEntry
 from singer.schema import Schema
 from streamduo.client import Client
@@ -53,43 +55,33 @@ def discover():
     return Catalog(streams)
 
 
-def sync(config, state, catalog):
-    print("in sync")
-    print(state)
-    print(catalog)
+def sync(config, catalog):
     """ Sync data from tap source """
     # Loop over selected streams in catalog
     for stream in catalog.streams:
         LOGGER.info("Syncing stream:" + stream.tap_stream_id)
-
-        bookmark_column = stream.replication_key
-        is_sorted = True  # TODO: indicate whether data is sorted ascending on bookmark value
 
         singer.write_schema(
             stream_name=stream.tap_stream_id,
             schema=stream.schema.to_dict(),
             key_properties=stream.key_properties,
         )
-
+        polling = True
+        tries = 0
         record_controller = Client(config['clientId'], config['clientSecret']).get_record_controller()
-        read_unread_response = record_controller.read_unread_records(config['streamId'], True, 1)
-        tap_data = read_unread_response.json()
-
-        max_bookmark = None
-        for row in tap_data:
-            # TODO: place type conversions or transformations here
-
-            # write one or more rows to the stream:
-            singer.write_records(stream.tap_stream_id, [row])
-            if bookmark_column:
-                if is_sorted:
-                    # update bookmark to latest value
-                    singer.write_state({stream.tap_stream_id: row[bookmark_column]})
-                else:
-                    # if data unsorted, save max value until end of writes
-                    max_bookmark = max(max_bookmark, row[bookmark_column])
-        if bookmark_column and not is_sorted:
-            singer.write_state({stream.tap_stream_id: max_bookmark})
+        while polling:
+            time.sleep(2*tries)
+            read_unread_response = record_controller.read_unread_records(config['streamId'], True, 100)
+            if read_unread_response.status_code != 200:
+                tries = tries + 1
+                if tries == 6:
+                    polling = False
+            else:
+                tap_data = read_unread_response.json()
+                for row in tap_data:
+                    singer.write_records(stream.tap_stream_id, [row])
+                if len(tap_data) < 100:
+                    polling = False
     return
 
 
@@ -108,7 +100,7 @@ def main():
             catalog = args.catalog
         else:
             catalog = discover()
-        sync(args.config, args.state, catalog)
+        sync(args.config, catalog)
 
 
 if __name__ == "__main__":
