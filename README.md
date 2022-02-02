@@ -19,7 +19,7 @@ Records are stored in a time-order series, and the "read-status" of each record 
 
 ## How the Tap Works
 
-Because read status is maintained within StreamDuo, there is no need to manage state within this tap. The tap continuously polls the `get unread records` endpoint from StreamDuo. 
+Because read status is maintained within StreamDuo, there is no need to manage state within this tap. The tap continuously polls the `get unread records` endpoint from StreamDuo. The process will poll in batches of 100 records, untill there are no further unread records in the stream, at which point the process will end.
 
 If your process dies, there is no need to adjust state, just start it again, and it will pickup where it left off.
 
@@ -114,20 +114,17 @@ pip install -e .
 ```
 
 
-
-### Unit Testing
-
-`python -m unittest`
-
-
-
 ### Integration Testing
-Using a live stream, add a few records to your stream and construct your config file....
+Using a live stream, and a client with `consumer` and `producer` permissions, run the integration tests...
 
-`tap-streamduo -c config.json `
+`python3 integration_test.py -c config.json`
 
+This will:
+- Write a test records to the stream using the StreamDuo SDK
+- Read unread records using the `tap-streamduo`
+- Confirm the test record was output to `stdout`
 
-These records can be viewed in your console to ensure their accuracy.
+If no errors are raised, it's all good.
 
 
 ---
