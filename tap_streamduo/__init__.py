@@ -73,9 +73,12 @@ def sync(config, catalog):
             time.sleep(2*tries)
             read_unread_response = record_controller.read_unread_records(config['streamId'], True, 100)
             if read_unread_response.status_code != 200:
+                LOGGER.info(f"API Error, response code {read_unread_response.status_code}.")
                 tries = tries + 1
                 if tries == 6:
                     polling = False
+                    LOGGER.warn("API Error, unable to connect, not responding with 200 code.")
+                    raise Exception("API Error, unable to connect.")
             else:
                 tap_data = read_unread_response.json()
                 for row in tap_data:
