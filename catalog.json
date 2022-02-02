@@ -42,7 +42,14 @@
         "additionalProperties": false
       },
       "stream": "sample_stream",
-      "metadata": []
+      "metadata": [
+        {
+          "metadata" : {
+            "selected" : false
+          },
+          "breadcrumb" : ["properties", "readStatus"]
+        }
+      ]
     }
   ]
 }

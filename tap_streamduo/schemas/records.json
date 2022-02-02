@@ -18,5 +18,6 @@
 	"dataPayload": {
 	"type": ["null", "string"]
 	}
-    }
+    },
+	"metadata": []
 }

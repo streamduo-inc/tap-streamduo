@@ -16,8 +16,9 @@ def main():
     write_record_response = record_controller.write_record(config['streamId'], test_record)
 
     # use tap to read unread
-    stream = os.popen('tap-streamduo -c config.json')
+    stream = os.popen('tap-streamduo -c config.json --catalog catalog.json')
     output = stream.read()
+    print (output)
     if "\"dataPayload\": {\"key1\": \"val1\"}" not in output:
         raise Exception("Record Not Found")
 
